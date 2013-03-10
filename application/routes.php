@@ -32,15 +32,53 @@
 |
 */
 
-Route::get('/', function()
-{
-	return View::make('home.index');
+Route::get('/', function() {
+    // lets get our posts and eager load the
+    // author
+    $photos = Photo::with('author')->all();
+    return View::make('pages.home')
+        ->with('photos', $photos);
 });
 
 Route::get('/info', function()
 {
   phpinfo();
 });
+
+Route::get('login', function() {
+  return View::make('pages.login');
+});
+
+Route::post('login', function() {
+  $username = Input::get('username');
+  $password = Input::get('password');
+  if ( Auth::attempt($username, $password) )
+  {
+    return Redirect::to('admin');
+  }
+  else
+  {
+  return Redirect::to('login')
+    ->with('login_errors', true);
+  }
+});
+
+Route::get('logout', function() {
+  Auth::logout();
+  return Redirect::to('/');
+});
+
+Route::get('admin', array('before' => 'auth', 'do' => function() {
+  $user = Auth::user();
+  return View::make('pages.new')->with('user', $user);
+}));
+
+Route::get('view/(:num)', function($photo) {
+    $post = Photo::find($photo);
+    return View::make('pages.full')
+        ->with('photo', $photo);
+});
+
 
 
 /*
