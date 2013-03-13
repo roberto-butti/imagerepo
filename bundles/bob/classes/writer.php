@@ -198,12 +198,16 @@ class Writer
 
 	private function _append_files()
 	{
-		foreach($this->_append as $file)
+		if ( ! Common::config('pretend') )
 		{
-			if (! File::exists($file['file']))  File::append($file['file'], "<?php\n");
+			foreach($this->_append as $file)
+			{
+				if (! File::exists($file['file']))  File::append($file['file'], "<?php\n");
 
-			File::append($file['file'], $file['contents']);
+				File::append($file['file'], $file['contents']);
+			}
 		}
+		
 	}
 
 	/**
